@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const sensorDataSchema = new mongoose.Schema({
   temperature: Number,
   co2Level: Number,

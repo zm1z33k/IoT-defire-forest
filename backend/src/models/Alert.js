@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 const alertSchema = new mongoose.Schema({
   sensorId: mongoose.Schema.Types.ObjectId,
   gps: String,
