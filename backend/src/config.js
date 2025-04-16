@@ -1,7 +1,9 @@
+require('dotenv').config();
+
 module.exports = {
   jwtSecret: 'super-secret-key',
   mongoURI: 'your-mongodb-cloud-url',
-  twilioSID: 'your-twilio-sid',
-  twilioToken: 'your-twilio-token',
-  twilioPhone: 'your-twilio-phone-number'
+  twilioSID: process.env.TWILIO_ACCOUNT_SID,
+  twilioToken: process.env.TWILIO_AUTH_TOKEN,
+  twilioPhone: process.env.TWILIO_PHONE_NUMBER
 };
