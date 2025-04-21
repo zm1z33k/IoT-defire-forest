@@ -1,10 +1,70 @@
-import React from 'react';
+// Settings.jsx
+import React, { useState } from 'react';
+import '../styles/Settings.css';
 
 const Settings = () => {
+  const [settings, setSettings] = useState({
+    tempMin: 86,
+    tempMax: 122,
+    co2Min: 86,
+    co2Max: 122,
+    humidityMin: 86,
+    humidityMax: 122,
+    refreshRate: 86,
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setSettings(prev => ({ ...prev, [name]: value }));
+  };
+
   return (
-    <div className="container">
+    <div className="settings-container">
       <h2>Settings</h2>
-      <p>Here you can configure system parameters (temperature limits, CO2 levels, humidity thresholds, etc).</p>
+
+      <div className="setting-group">
+        <h3>Temperature</h3>
+        <label>
+          min °F
+          <input type="number" name="tempMin" value={settings.tempMin} onChange={handleChange} />
+        </label>
+        <label>
+          max °F
+          <input type="number" name="tempMax" value={settings.tempMax} onChange={handleChange} />
+        </label>
+      </div>
+
+      <div className="setting-group">
+        <h3>CO2</h3>
+        <label>
+          min ppm
+          <input type="number" name="co2Min" value={settings.co2Min} onChange={handleChange} />
+        </label>
+        <label>
+          max ppm
+          <input type="number" name="co2Max" value={settings.co2Max} onChange={handleChange} />
+        </label>
+      </div>
+
+      <div className="setting-group">
+        <h3>Humidity</h3>
+        <label>
+          min %
+          <input type="number" name="humidityMin" value={settings.humidityMin} onChange={handleChange} />
+        </label>
+        <label>
+          max %
+          <input type="number" name="humidityMax" value={settings.humidityMax} onChange={handleChange} />
+        </label>
+      </div>
+
+      <div className="setting-group">
+        <h3>Refresh Rate</h3>
+        <input type="number" name="refreshRate" value={settings.refreshRate} onChange={handleChange} /> minutes
+      </div>
+      <button className="confirm-button" onClick={() => alert('Settings saved!')}>
+  Confirm
+</button>
     </div>
   );
 };
