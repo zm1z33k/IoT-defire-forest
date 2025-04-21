@@ -1,34 +1,8 @@
+// SystemAlert.js
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import '../styles/SystemAlert.css'; // Import your CSS file for styling
-
-const mockAlerts = [
-  {
-    _id: '1',
-    type: 'Fire hazard',
-    id: '56789046',
-    dateTime: '31.03.2025 10:00',
-    gps: '50.880078, 14.249905',
-    temperature: '56 F°',
-    humidity: '10%',
-    co2Level: '15 ppm',
-    status: 'Active',
-    confirmed: false,
-  },
-  {
-    _id: '2',
-    type: 'Suspected fire',
-    id: '56789046',
-    dateTime: '31.03.2025 10:00',
-    gps: '50.880078, 14.249905',
-    temperature: '56 F°',
-    humidity: '10%',
-    co2Level: '680 ppm',
-    status: 'Confirmed...',
-    confirmed: true,
-  },
-  // добавь больше при необходимости
-];
+import '../styles/SystemAlert.css';
+import { alerts as mockAlerts } from '../mock/mockData';
 
 const SystemAlert = () => {
   const [alerts, setAlerts] = useState([]);
@@ -40,9 +14,11 @@ const SystemAlert = () => {
   }, []);
 
   const handleConfirm = (id) => {
-    setAlerts(alerts.map(alert =>
-      alert._id === id ? { ...alert, confirmed: true, status: 'Confirmed...' } : alert
-    ));
+    setAlerts(prevAlerts =>
+      prevAlerts.map(alert =>
+        alert._id === id ? { ...alert, confirmed: true, status: 'Confirmed...' } : alert
+      )
+    );
   };
 
   return (
@@ -51,12 +27,12 @@ const SystemAlert = () => {
       <div className="grid">
         {alerts.map(alert => (
           <div key={alert._id} className="card">
-            <p><strong>{alert.type}</strong>  ID {alert.id}</p>
-            <p><strong>Date/Time</strong><br />{alert.dateTime}</p>
-            <p><strong>GPS</strong><br />{alert.gps}</p>
-            <p><strong>t°</strong><br />{alert.temperature}</p>
-            <p><strong>Humidity</strong><br />{alert.humidity}</p>
-            <p><strong>CO2</strong><br />{alert.co2Level}</p>
+            <p><strong>{alert.type}</strong> ID {alert.sensorId}</p>
+            <p><strong>Date/Time</strong><br />{new Date(alert.dateTime).toLocaleString()}</p>
+            <p><strong>GPS</strong><br />{alert.gps.join(', ')}</p>
+            <p><strong>t°</strong><br />{alert.temperature} °C</p>
+            <p><strong>Humidity</strong><br />{alert.humidity} %</p>
+            <p><strong>CO2</strong><br />{alert.co2Level} ppm</p>
             <p><strong>System status</strong><br />{alert.status}</p>
 
             <div className="button-group">
@@ -67,7 +43,7 @@ const SystemAlert = () => {
                   <button className="gray-button">Ignore</button>
                 </>
               ) : (
-                <button className="gray-button">Read More</button>
+                <Link to={`/alerts/${alert._id}`} className="gray-button">Read More</Link>
               )}
             </div>
           </div>
