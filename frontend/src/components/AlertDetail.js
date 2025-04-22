@@ -4,7 +4,6 @@ import { alerts } from '../mock/mockData';
 
 const AlertDetail = () => {
   const { id } = useParams();
-
   const alert = alerts.find(a => a._id === id);
 
   if (!alert) {
@@ -12,7 +11,7 @@ const AlertDetail = () => {
   }
 
   return (
-    <div className="container">
+    <div className="alert-detail-wrapper">
       <h2>Alert Detail</h2>
       <p><strong>Type:</strong> {alert.type}</p>
       <p><strong>ID:</strong> {alert.sensorId}</p>
@@ -23,9 +22,11 @@ const AlertDetail = () => {
       <p><strong>CO2 Level:</strong> {alert.co2Level} ppm</p>
       <p><strong>Status:</strong> {alert.status}</p>
       <p><strong>Description:</strong> {alert.description}</p>
-      <br />
-      <Link to="/dashboard" className="gray-button">← Back</Link>
-      <Link to={`/monitoring/${alert.sensorId}`} className="gray-button">View Monitoring</Link>
+
+      <div className="button-group">
+        <Link to="/dashboard" className="gray-button">← Back</Link>
+        <Link to={`/monitoring/${alert.sensorId}`} className="gray-button">View Monitoring</Link>
+      </div>
     </div>
   );
 };
