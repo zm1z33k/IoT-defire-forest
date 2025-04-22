@@ -1,5 +1,6 @@
 import React from 'react';
 import 'leaflet/dist/leaflet.css';
+import '../src/styles.css';
 import { Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -13,7 +14,10 @@ import Settings from './components/Settings';
 import Dashboard from './components/Dashboard';
 import AlertDetail from './components/AlertDetail';
 
+
 function App() {
+
+
   return (
     <>
       <Navbar />
@@ -28,7 +32,6 @@ function App() {
         <Route path="/monitoring/:id" element={<MonitoringDetail />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="*" element={<NotFoundPage />} />
-        
       </Routes>
     </>
   );

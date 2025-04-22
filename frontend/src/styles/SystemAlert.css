@@ -1,20 +1,40 @@
+:root {
+    --bg-color: #ffffff;
+    --text-color: #000;
+    --card-bg: #d9d9d9;
+    --button-bg: #bcbcbc;
+    --button-hover: #a3a3a3;
+}
+
+[data-theme='dark'] {
+    --bg-color: #1e1e1e;
+    --text-color: #fff;
+    --card-bg: #2a2a2a;
+    --button-bg: #444;
+    --button-hover: #666;
+}
+
 .system-alert-container {
     padding: 20px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     font-family: sans-serif;
 }
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
     margin-top: 20px;
 }
 
 .card {
-    background-color: #d9d9d9;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border-radius: 8px;
     padding: 15px;
-    border-radius: 3px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    transition: background-color 0.3s ease;
 }
 
 .card p {
@@ -23,16 +43,51 @@
 }
 
 .button-group {
-    margin-top: 10px;
     display: flex;
-    gap: 10px;
     flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
 }
 
 .gray-button {
-    background-color: #bcbcbc;
+    background-color: var(--button-bg);
+    color: var(--text-color);
     border: none;
     padding: 6px 12px;
-    font-weight: bold;
+    border-radius: 4px;
     cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+    text-decoration: none;
+}
+
+.gray-button:hover {
+    background-color: var(--button-hover);
+}
+
+@media screen and (max-width: 600px) {
+    .card {
+        font-size: 13px;
+    }
+}
+
+.alert-detail-container {
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+.alert-detail-container h2 {
+    margin-bottom: 20px;
+}
+
+.alert-detail-container p {
+    margin-bottom: 10px;
+}
+
+.button-group {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
 }

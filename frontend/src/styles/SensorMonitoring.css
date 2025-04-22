@@ -1,0 +1,61 @@
+:root {
+    --bg-color: #ffffff;
+    --text-color: #000;
+    --table-header: #ddd;
+    --table-row: #f5f5f5;
+    --link-color: #222;
+    --link-hover: #555;
+}
+
+[data-theme='dark'] {
+    --bg-color: #1e1e1e;
+    --text-color: #f0f0f0;
+    --table-header: #333;
+    --table-row: #2a2a2a;
+    --link-color: #f0f0f0;
+    --link-hover: #ffce00;
+}
+
+.sensor-container {
+    padding: 20px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: sans-serif;
+}
+
+.sensor-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--table-header);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sensor-table th,
+.sensor-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ccc;
+}
+
+.sensor-table tbody tr:nth-child(odd) {
+    background-color: var(--table-row);
+}
+
+.sensor-link {
+    color: var(--link-color);
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.2s ease;
+}
+
+.sensor-link:hover {
+    color: var(--link-hover);
+    text-decoration: underline;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 20px;
+}
