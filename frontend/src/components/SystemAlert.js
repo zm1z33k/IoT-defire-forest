@@ -2,23 +2,26 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/SystemAlert.css';
-import { alerts as mockAlerts } from '../mock/mockData';
+import axios from 'axios';
 
 const SystemAlert = () => {
   const [alerts, setAlerts] = useState([]);
 
-  useEffect(() => {
-    setTimeout(() => {
-      setAlerts(mockAlerts);
-    }, 300);
+   useEffect(() => {
+    axios.get('http://localhost:5001/api/firebasedata/alerts')
+      .then(res => setAlerts(res.data))
+      .catch(err => console.error(err));
   }, []);
 
-  const handleConfirm = (id) => {
-    setAlerts(prevAlerts =>
-      prevAlerts.map(alert =>
-        alert._id === id ? { ...alert, confirmed: true, status: 'Confirmed...' } : alert
-      )
-    );
+  const handleConfirm = async (id) => {
+    try {
+      await axios.patch(`http://localhost:5001/api/firebasedata/alerts/${id}/confirm`);
+      setAlerts(prev =>
+        prev.map(a => a._id === id ? { ...a, confirmed: true, status: 'Confirmed' } : a)
+      );
+    } catch (err) {
+      console.error('Error confirming alert:', err);
+    }
   };
 
   return (
@@ -40,7 +43,6 @@ const SystemAlert = () => {
                 <>
                   <Link to={`/alerts/${alert._id}`} className="gray-button">More</Link>
                   <button className="gray-button" onClick={() => handleConfirm(alert._id)}>Confirm</button>
-                  <button className="gray-button">Ignore</button>
                 </>
               ) : (
                 <Link to={`/alerts/${alert._id}`} className="gray-button">Read More</Link>
