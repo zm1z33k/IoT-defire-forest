@@ -1,6 +1,12 @@
-const SensorData = require('../models/SensorData');
+// sensorDataController.js
+const db = require('../firebase');
 
 exports.getAll = async (req, res) => {
-  const data = await SensorData.find().sort({ createdAt: -1 });
-  res.json(data);
+  try {
+    const snapshot = await db.collection('sensorData').get();
+    const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to load sensor data', error: err });
+  }
 };

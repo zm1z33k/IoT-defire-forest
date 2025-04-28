@@ -1,16 +1,17 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const bcrypt = require('bcryptjs');
-const config = require('../config');
+
+const mockUser = {
+  email: 'admin@example.com',
+  password: '123456', // хардкод для теста
+};
 
 exports.login = async (req, res) => {
   const { email, password } = req.body;
-  const user = await User.findOne({ email });
-  if (!user) return res.status(404).json({ message: 'User not found' });
 
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
+  if (email === mockUser.email && password === mockUser.password) {
+    const token = jwt.sign({ email }, 'supersecret', { expiresIn: '1h' });
+    return res.json({ token });
+  }
 
-  const token = jwt.sign({ id: user._id, role: user.role }, config.jwtSecret);
-  res.json({ token, user });
+  res.status(401).json({ message: 'Invalid credentials' });
 };

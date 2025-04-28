@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { getAlerts, confirmAlert, createAlert } = require('../controllers/alertController');
-const auth = require('../middleware/authMiddleware');
 
-router.get('/', auth, getAlerts);
-router.put('/:id/confirm', auth, confirmAlert);
-router.post('/', auth, createAlert);
+// nemusíš používat `auth` pro testování
+router.get('/', getAlerts);
+router.post('/', createAlert);
+router.put('/:id/confirm', confirmAlert); // <- potvrzení alertu
 
 module.exports = router;
