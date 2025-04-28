@@ -1,10 +1,9 @@
-// Dashboard.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import '../styles/Dashboard.css';
+import '../styles/Dashboard.css'; // Import your CSS file for styling
 import { sensorData, alerts } from '../mock/mockData';
 
 const latestSensorData = sensorData;
@@ -34,7 +33,8 @@ const FixMapSize = () => {
 };
 
 const Dashboard = () => {
-  const [mapPosition, setMapPosition] = useState('top');
+  const [mapPosition, setMapPosition] = useState('top'); 
+
 
   const renderMap = () => (
     <MapContainer center={[50.880078, 14.249905]} zoom={13} style={{ height: '100%', width: '100%' }}>
@@ -49,25 +49,27 @@ const Dashboard = () => {
           </Popup>
         </Marker>
       ))}
-      {alerts.map(alert => (
-        <Marker key={alert._id} position={[alert.gps[0] + 0.001, alert.gps[1] + 0.001]} icon={fireIcon}>
-          <Popup>
-            <strong>{alert.type}</strong><br />
-            Sensor: {alert.sensorId}<br />
-            Status: {alert.status}
-          </Popup>
-        </Marker>
-      ))}
+       {/* Алерты */}
+    {alerts.map(alert => (
+      <Marker key={alert._id} position={[alert.gps[0] + 0.001, alert.gps[1] + 0.001]} icon={fireIcon}>
+        <Popup>
+          <strong>{alert.type}</strong><br />
+          Sensor: {alert.sensorId}<br />
+          Status: {alert.status}
+        </Popup>
+      </Marker>
+    ))}
     </MapContainer>
   );
 
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
-        <h2 className="dashboard-title">Dashboard</h2>
+        <h2>Dashboard</h2>
         <div className="map-toggle-group">
           <button onClick={() => setMapPosition('top')}>Top</button>
           <button onClick={() => setMapPosition('hidden')}>Hide</button>
+
         </div>
       </div>
 
@@ -89,6 +91,7 @@ const Dashboard = () => {
           <SensorDataSection />
         </>
       )}
+      
     </div>
   );
 };

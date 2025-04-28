@@ -1,6 +1,6 @@
-// Settings.jsx
 import React, { useState } from 'react';
 import '../styles/Settings.css';
+import axios from 'axios';
 
 const Settings = () => {
   const [settings, setSettings] = useState({
@@ -17,6 +17,16 @@ const Settings = () => {
     const { name, value } = e.target;
     setSettings(prev => ({ ...prev, [name]: value }));
   };
+
+  const handleSave = async () => {
+  try {
+    await axios.post('http://localhost:5001/api/settings', settings);
+    alert('Settings saved!');
+  } catch (error) {
+    console.error('Error saving settings:', error);
+    alert('Error saving settings');
+  }
+};
 
   return (
     <div className="settings-container">
@@ -62,9 +72,7 @@ const Settings = () => {
         <h3>Refresh Rate</h3>
         <input type="number" name="refreshRate" value={settings.refreshRate} onChange={handleChange} /> minutes
       </div>
-      <button className="confirm-button" onClick={() => alert('Settings saved!')}>
-  Confirm
-</button>
+      <button className="confirm-button" onClick={handleSave}>Confirm</button>
     </div>
   );
 };

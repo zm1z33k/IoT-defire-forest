@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-axios.get('http://localhost:5001/api/alerts');
 const API_URL = 'http://localhost:5001/api/alerts';
 
 export const getAlerts = async () => {
