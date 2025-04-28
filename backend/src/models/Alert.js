@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const alertSchema = new mongoose.Schema({
-  sensorId: mongoose.Schema.Types.ObjectId,
+  sensorId: String,
   gps: String,
   co2Level: Number,
   temperature: Number,
@@ -11,3 +11,4 @@ const alertSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('Alert', alertSchema);
+//mongoose.Schema.Types.ObjectId

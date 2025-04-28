@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { getAll } = require('../controllers/sensorDataController');
-const auth = require('../middleware/authMiddleware');
 
-router.get('/', auth, getAll);
+router.get('/', getAll); // bez auth pro jednodušší test
 
 module.exports = router;
