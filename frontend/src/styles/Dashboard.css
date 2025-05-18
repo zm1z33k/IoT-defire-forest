@@ -39,16 +39,20 @@ section {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 15px;
 }
+.card,
+.setting-group,
+.sensor-chart {
+    box-shadow:
+        4px 4px 10px rgba(0, 0, 0, 0.1),
+        -4px -4px 10px rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    transition: box-shadow 0.3s ease;
+}
 
-.card {
-    background-color: var(--card-bg);
-        color: var(--text-color);
-        border: 1px solid var(--input-border);
-    padding: 15px;
-    border-radius: 5px;
-    font-size: 14px;
-    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease;
+.card:hover {
+    box-shadow:
+        2px 2px 6px rgba(0, 0, 0, 0.15),
+        -2px -2px 6px rgba(255, 255, 255, 0.6);
 }
 
 .alert-card {
