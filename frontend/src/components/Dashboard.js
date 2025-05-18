@@ -2,12 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import axios from 'axios';
 import 'leaflet/dist/leaflet.css';
-import '../styles/Dashboard.css'; // Import your CSS file for styling
-import { sensorData, alerts } from '../mock/mockData';
-
-const latestSensorData = sensorData;
-const mockAlerts = alerts;
+import '../styles.css';
 
 const sensorIcon = new L.Icon({
   iconUrl: 'https://cdn-icons-png.flaticon.com/512/1397/1397898.png',
@@ -15,6 +12,7 @@ const sensorIcon = new L.Icon({
   iconAnchor: [16, 32],
   popupAnchor: [0, -32],
 });
+
 const fireIcon = new L.Icon({
   iconUrl: 'https://cdn-icons-png.flaticon.com/512/785/785116.png',
   iconSize: [32, 32],
@@ -33,8 +31,19 @@ const FixMapSize = () => {
 };
 
 const Dashboard = () => {
-  const [mapPosition, setMapPosition] = useState('top'); 
+  const [mapPosition, setMapPosition] = useState('top');
+  const [latestSensorData, setSensorData] = useState([]);
+  const [alerts, setAlerts] = useState([]);
 
+  useEffect(() => {
+    axios.get('http://localhost:5001/api/firebasedata/monitoring')
+      .then(res => setSensorData(res.data))
+      .catch(err => console.error('Sensor data error:', err));
+
+    axios.get('http://localhost:5001/api/firebasedata/alerts')
+      .then(res => setAlerts(res.data))
+      .catch(err => console.error('Alerts error:', err));
+  }, []);
 
   const renderMap = () => (
     <MapContainer center={[50.880078, 14.249905]} zoom={13} style={{ height: '100%', width: '100%' }}>
@@ -43,22 +52,21 @@ const Dashboard = () => {
       {latestSensorData.map(sensor => (
         <Marker key={sensor._id} position={sensor.gps} icon={sensorIcon}>
           <Popup>
-            Sensor {sensor._id}<br />
+            Sensor {sensor.sensorId}<br />
             Temp: {sensor.temperature} °C<br />
             CO2: {sensor.co2Level} ppm
           </Popup>
         </Marker>
       ))}
-       {/* Алерты */}
-    {alerts.map(alert => (
-      <Marker key={alert._id} position={[alert.gps[0] + 0.001, alert.gps[1] + 0.001]} icon={fireIcon}>
-        <Popup>
-          <strong>{alert.type}</strong><br />
-          Sensor: {alert.sensorId}<br />
-          Status: {alert.status}
-        </Popup>
-      </Marker>
-    ))}
+      {alerts.map(alert => (
+        <Marker key={alert._id} position={[alert.gps[0] + 0.001, alert.gps[1] + 0.001]} icon={fireIcon}>
+          <Popup>
+            <strong>{alert.type || 'Alert'}</strong><br />
+            Sensor: {alert.sensorId}<br />
+            Status: {alert.status}
+          </Popup>
+        </Marker>
+      ))}
     </MapContainer>
   );
 
@@ -66,51 +74,34 @@ const Dashboard = () => {
     <div className="dashboard-container">
       <div className="dashboard-header">
         <h2>Dashboard</h2>
-        <div className="map-toggle-group">
-          <button onClick={() => setMapPosition('top')}>Top</button>
-          <button onClick={() => setMapPosition('hidden')}>Hide</button>
-
+        <div className="button-group">
+          <button onClick={() => setMapPosition('top')} className='button'>Top</button>
+          <button onClick={() => setMapPosition('hidden')} className='button'>Hide</button>
         </div>
       </div>
 
       {mapPosition === 'top' && <div className="dashboard-map-full">{renderMap()}</div>}
 
-      {mapPosition === 'right' ? (
-        <div className="dashboard-layout">
-          <div className="dashboard-main">
-            <AlertsSection />
-            <SensorDataSection />
-          </div>
-          <div className="dashboard-map-side">
-            {renderMap()}
-          </div>
-        </div>
-      ) : (
-        <>
-          <AlertsSection />
-          <SensorDataSection />
-        </>
-      )}
-      
+      <AlertsSection alerts={alerts} />
+      <SensorDataSection data={latestSensorData} />
     </div>
   );
 };
 
-const AlertsSection = () => (
+const AlertsSection = ({ alerts }) => (
   <section>
     <h3>🔥 Active Alerts</h3>
-    {mockAlerts.length === 0 ? (
+    {alerts.length === 0 ? (
       <p>No active alerts</p>
     ) : (
       <div className="grid">
-        {mockAlerts.map(alert => (
+        {alerts.map(alert => (
           <div className="card alert-card" key={alert._id}>
             <p><strong>Sensor:</strong> {alert.sensorId}</p>
-            <p><strong>Type:</strong> {alert.type}</p>
             <p><strong>Status:</strong> {alert.status}</p>
-            <p><strong>Time:</strong> {alert.dateTime}</p>
+            <p><strong>Time:</strong> {new Date(alert.dateTime).toLocaleString()}</p>
             <p><strong>GPS:</strong> {alert.gps.join(', ')}</p>
-            <Link to={`/alerts/${alert._id}`} className="gray-button">More</Link>
+            <Link to={`/alerts/${alert._id}`} className="button">More</Link>
           </div>
         ))}
       </div>
@@ -118,20 +109,22 @@ const AlertsSection = () => (
   </section>
 );
 
-const SensorDataSection = () => (
+const SensorDataSection = ({ data }) => (
   <section>
     <h3>📈 Latest Sensor Data</h3>
     <div className="grid">
-      {latestSensorData.map(sensor => (
-        <div className="card" key={sensor._id}>
-          <p><strong>Sensor ID:</strong> {sensor.sensorId}</p>
-          <p><strong>GPS:</strong> {sensor.gps.join(', ')}</p>
-          <p><strong>Temp:</strong> {sensor.temperature}°C</p>
-          <p><strong>Humidity:</strong> {sensor.humidity}</p>
-          <p><strong>CO2:</strong> {sensor.co2Level} ppm</p>
-          <p><strong>Last updated:</strong><br />{new Date(sensor.createdAt).toLocaleString()}</p>
-          <Link to={`/monitoring/${sensor.sensorId}`} className="gray-button">View Monitoring</Link>
-        </div>
+      {data.map(sensor => (
+       <div className="sensor-card" key={sensor._id}>
+  <p><strong className="label">Sensor ID:</strong> <span className="value">{sensor.sensorId}</span></p>
+  <p><strong className="label">📍 GPS:</strong> <span className="value">{sensor.gps.join(', ')}</span></p>
+  <p><strong className="label">🌡 Temp:</strong> <span className="temp-value">{sensor.temperature}°C</span></p>
+  <p><strong className="label">💧 Humidity:</strong> <span className="humidity-value">{sensor.humidity} %</span></p>
+  <p><strong className="label">🟤 CO₂:</strong> <span className="co2-value">{sensor.co2Level} ppm</span></p>
+  <p><strong className="label">🕓 Last updated:</strong><br />
+    <span className="date-value">{new Date(sensor.dateTime).toLocaleString()}</span>
+  </p>
+  <Link to={`/monitoring/${sensor.sensorId}`} className="button">View Monitoring</Link>
+</div>
       ))}
     </div>
   </section>

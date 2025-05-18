@@ -1,14 +1,21 @@
-import React from 'react';
+import { React, useState, useEffect} from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { alerts } from '../mock/mockData';
-
+import axios from 'axios';
+import '../styles.css';
 const AlertDetail = () => {
-  const { id } = useParams();
-  const alert = alerts.find(a => a._id === id);
+   const { id } = useParams();
+  const [alert, setAlert] = useState(null);
 
-  if (!alert) {
-    return <div>Alert not found</div>;
-  }
+  useEffect(() => {
+    axios.get('http://localhost:5001/api/firebasedata/alerts')
+      .then(res => {
+        const found = res.data.find(a => a._id === id);
+        setAlert(found || null);
+      })
+      .catch(err => console.error('Failed to load alert:', err));
+  }, [id]);
+
+  if (!alert) return <div>Alert not found</div>;
 
   return (
     <div className="alert-detail-wrapper">

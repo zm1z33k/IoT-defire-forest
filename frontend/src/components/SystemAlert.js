@@ -1,7 +1,7 @@
 // SystemAlert.js
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import '../styles/SystemAlert.css';
+import '../styles.css';
 import axios from 'axios';
 
 const SystemAlert = () => {
@@ -29,7 +29,16 @@ const SystemAlert = () => {
       <h2>System Alert</h2>
       <div className="grid">
         {alerts.map(alert => (
-          <div key={alert._id} className="card">
+         <div
+              key={alert._id}
+                className={`card ${
+                alert.status === 'Warning'
+                ? 'alert-card warning'
+                : alert.status === 'Active'
+                ? 'alert-card active'
+                : 'alert-card neutral'
+                }`}
+>
             <p><strong>{alert.type}</strong> ID {alert.sensorId}</p>
             <p><strong>Date/Time</strong><br />{new Date(alert.dateTime).toLocaleString()}</p>
             <p><strong>GPS</strong><br />{alert.gps.join(', ')}</p>

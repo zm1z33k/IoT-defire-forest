@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import '../styles/MonitoringDetail.css';
+import '../styles.css';
+import SensorChart from './SensorChart';
 
 const MonitoringDetail = () => {
   const { id } = useParams();
   const [data, setData] = useState([]);
   const [sortOption, setSortOption] = useState('recent');
+  const [timeRange, setTimeRange] = useState('24h');
 
   useEffect(() => {
     axios.get(`http://localhost:5001/api/firebasedata/monitoring/${id}`)
@@ -14,8 +16,19 @@ const MonitoringDetail = () => {
       .catch(err => console.error(err));
   }, [id]);
 
+  const getTimeLimit = () => {
+    const now = new Date();
+    switch (timeRange) {
+      case '7d': return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      case '30d': return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      case 'today': return new Date(new Date().setHours(0, 0, 0, 0));
+      default: return new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    }
+  };
 
-const sortData = (data, option) => {
+  const filteredByTime = data.filter(item => new Date(item.dateTime) >= getTimeLimit());
+
+  const sortData = (data, option) => {
     const sorted = [...data];
     switch (option) {
       case 'recent':
@@ -39,18 +52,25 @@ const sortData = (data, option) => {
     }
   };
 
-   const sortedData = sortData(data, sortOption);
+  const filteredData = sortData(filteredByTime, sortOption);
 
   if (data.length === 0) {
     return <div>No data for sensor ID {id}</div>;
   }
 
-
   return (
     <div className="container">
       <h2>Sensor Monitoring – ID: {id}</h2>
-      {/* 🔥 Сортировка */}
+
       <div className="sort-panel">
+        <label>Time Range:</label>
+        <select value={timeRange} onChange={(e) => setTimeRange(e.target.value)}>
+          <option value="24h">Last 24h</option>
+          <option value="today">Today</option>
+          <option value="7d">Last 7 days</option>
+          <option value="30d">Last 30 days</option>
+        </select>
+
         <label>Sort by:</label>
         <select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
           <option value="recent">Newest first</option>
@@ -63,7 +83,10 @@ const sortData = (data, option) => {
           <option value="humidityDesc">Humidity: High to Low</option>
         </select>
       </div>
-      <table>
+
+      
+
+      <table className="sensor-table">
         <thead>
           <tr>
             <th>GPS Coordinates</th>
@@ -75,12 +98,12 @@ const sortData = (data, option) => {
           </tr>
         </thead>
         <tbody>
-          {data.map((item) => (
+          {filteredData.map((item) => (
             <tr key={item._id}>
               <td>{item.gps.join(', ')}</td>
-              <td>{item.temperature} °F</td>
-              <td>{item.co2Level} ppm</td>
-              <td>{item.humidity} %</td>
+              <td><span className="temp-value">{item.temperature} °F</span></td>
+<td><span className="co2-value">{item.co2Level} ppm</span></td>
+<td><span className="humidity-value">{item.humidity} %</span></td>
               <td>{item.status || 'N/A'}</td>
               <td>{new Date(item.dateTime).toLocaleString()}</td>
             </tr>
@@ -88,6 +111,7 @@ const sortData = (data, option) => {
         </tbody>
       </table>
       <br />
+      <SensorChart data={filteredData} />
       <Link to="/dashboard" className="gray-button">← Back</Link>
     </div>
   );
