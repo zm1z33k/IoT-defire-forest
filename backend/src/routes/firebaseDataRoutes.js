@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../firebase');
+const {createSensorData} = require('../controllers/sensorDataController');
+
+
+router.post('/monitoring', createSensorData);
 
 
 router.get('/alerts', async (req, res) => {

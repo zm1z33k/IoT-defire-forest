@@ -20,7 +20,7 @@ const fakeData = [
     confirmed: false,
   },
   {
-    sensorId: "B17",
+    sensorId: "A26",
     temperature: 90,
     co2Level: 600,
     humidity: 20,

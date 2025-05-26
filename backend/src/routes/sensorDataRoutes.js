@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { getAll } = require('../controllers/sensorDataController');
+const { createSensorData } = require('../controllers/sensorDataController');
 
-router.get('/', getAll); // bez auth pro jednodušší test
+router.post('/', createSensorData);
 
 module.exports = router;

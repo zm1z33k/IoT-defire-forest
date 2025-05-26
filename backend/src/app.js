@@ -5,14 +5,17 @@ const userRoutes = require('./routes/userRoutes');
 const sensorDataRoutes = require('./routes/sensorDataRoutes');
 const alertRoutes = require('./routes/alertRoutes');
 const testRoutes = require('./routes/testRoutes');
-const firbasedataRoutes = require('./routes/firebaseDataRoutes');
+const firbaseDataRoutes = require('./routes/firebaseDataRoutes');
 const settingRoutes = require('./routes/settingRoutes');
 
 const path = require('path');
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: '*', // Разрешаем все источники
+    
+}));
 app.use(express.json());
 
 // ✅ Сначала API маршруты
@@ -21,7 +24,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/sensors', sensorDataRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/test', testRoutes);
-app.use('/api/firebasedata', firbasedataRoutes);
+app.use('/api/firebasedata', firbaseDataRoutes);
 app.use('/api/settings', settingRoutes);
 
 // ✅ Потом статика
