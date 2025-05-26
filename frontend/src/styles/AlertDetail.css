@@ -1,0 +1,66 @@
+.alert-detail-wrapper {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 2rem;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    color: var(--text-color);
+}
+
+.alert-heading {
+    font-size: 28px;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.alert-card p {
+    margin: 0.5rem 0;
+    font-size: 16px;
+}
+
+.status.confirmed {
+    color: green;
+    font-weight: bold;
+}
+
+.status.active {
+    color: #e53935;
+    font-weight: bold;
+}
+
+.button-group {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.gray-button,
+.primary-button {
+    padding: 10px 18px;
+    font-size: 15px;
+    border-radius: 6px;
+    border: none;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.gray-button {
+    background-color: #ccc;
+    color: #222;
+}
+
+.gray-button:hover {
+    background-color: #bbb;
+}
+
+.primary-button {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.primary-button:hover {
+    background-color: #0056b3;
+}

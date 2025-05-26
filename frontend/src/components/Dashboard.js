@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import axios from 'axios';
 import 'leaflet/dist/leaflet.css';
-import '../styles.css';
+import '../styles/Dashboard.css';
 
 const sensorIcon = new L.Icon({
   iconUrl: 'https://cdn-icons-png.flaticon.com/512/1397/1397898.png',
@@ -52,10 +52,11 @@ const Dashboard = () => {
       {latestSensorData.map(sensor => (
         <Marker key={sensor._id} position={sensor.gps} icon={sensorIcon}>
           <Popup>
-            Sensor {sensor.sensorId}<br />
-            Temp: {sensor.temperature} °C<br />
-            CO2: {sensor.co2Level} ppm
-          </Popup>
+                            <strong>{sensor.sensorId}</strong>
+                            <br />🌡 Temp: {sensor.temperature} °C
+                            <br />💧 Humidity: {sensor.humidity} %
+                            <br />🟤 CO₂: {sensor.co2Level} ppm
+                          </Popup>
         </Marker>
       ))}
       {alerts.map(alert => (
@@ -95,7 +96,7 @@ const AlertsSection = ({ alerts }) => (
       <p>No active alerts</p>
     ) : (
       <div className="grid">
-        {alerts.map(alert => (
+        {Array.isArray(alerts) && alerts.map(alert => (
           <div className="card alert-card" key={alert._id}>
             <p><strong>Sensor:</strong> {alert.sensorId}</p>
             <p><strong>Status:</strong> {alert.status}</p>

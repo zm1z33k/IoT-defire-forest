@@ -11,25 +11,32 @@ const MonitoringDetail = () => {
   const [timeRange, setTimeRange] = useState('24h');
 
   useEffect(() => {
-    axios.get(`https://wildfireeye.onrender.com/api/firebasedata/monitoring/${id}`)
-      .then(res => setData(res.data))
-      .catch(err => console.error(err));
+    axios
+      .get(`https://wildfireeye.onrender.com/api/firebasedata/monitoring/${id}`)
+      .then((res) => setData(res.data))
+      .catch((err) => console.error(err));
   }, [id]);
 
   const getTimeLimit = () => {
     const now = new Date();
     switch (timeRange) {
-      case '7d': return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      case '30d': return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-      case 'today': return new Date(new Date().setHours(0, 0, 0, 0));
-      default: return new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      case '7d':
+        return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      case '30d':
+        return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      case 'today':
+        return new Date(new Date().setHours(0, 0, 0, 0));
+      case 'all':
+        return new Date(0); // начало эпохи Unix, то есть "всё время"
+      default:
+        return new Date(now.getTime() - 24 * 60 * 60 * 1000);
     }
   };
 
-  const filteredByTime = data.filter(item => new Date(item.dateTime) >= getTimeLimit());
+  const filteredByTime = data.filter((item) => new Date(item.dateTime) >= getTimeLimit());
 
-  const sortData = (data, option) => {
-    const sorted = [...data];
+  const sortData = (arr, option) => {
+    const sorted = [...arr];
     switch (option) {
       case 'recent':
         return sorted.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
@@ -54,10 +61,6 @@ const MonitoringDetail = () => {
 
   const filteredData = sortData(filteredByTime, sortOption);
 
-  if (data.length === 0) {
-    return <div>No data for sensor ID {id}</div>;
-  }
-
   return (
     <div className="container">
       <h2>Sensor Monitoring – ID: {id}</h2>
@@ -69,6 +72,7 @@ const MonitoringDetail = () => {
           <option value="today">Today</option>
           <option value="7d">Last 7 days</option>
           <option value="30d">Last 30 days</option>
+          <option value="all">All Time</option>
         </select>
 
         <label>Sort by:</label>
@@ -84,34 +88,42 @@ const MonitoringDetail = () => {
         </select>
       </div>
 
-      
+      {filteredData.length === 0 ? (
+        <p style={{ color: 'gray', marginBottom: '1rem' }}>
+          ⚠️ No data available for this time range.
+        </p>
+      ) : (
+        <>
+          <table className="sensor-table">
+            <thead>
+              <tr>
+                <th>GPS Coordinates</th>
+                <th>Temperature</th>
+                <th>CO2 Level</th>
+                <th>Humidity</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredData.map((item) => (
+                <tr key={item._id}>
+                  <td>{item.gps.join(', ')}</td>
+                  <td className="temp-value">{item.temperature} °F</td>
+                  <td className="co2-value">{item.co2Level} ppm</td>
+                  <td className="humidity-value">{item.humidity} %</td>
+                  <td>{item.status || 'N/A'}</td>
+                  <td>{new Date(item.dateTime).toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-      <table className="sensor-table">
-        <thead>
-          <tr>
-            <th>GPS Coordinates</th>
-            <th>Temperature</th>
-            <th>CO2 Level</th>
-            <th>Humidity</th>
-            <th>System Status</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredData.map((item) => (
-            <tr key={item._id}>
-              <td>{item.gps.join(', ')}</td>
-              <td><span className="temp-value">{item.temperature} °F</span></td>
-<td><span className="co2-value">{item.co2Level} ppm</span></td>
-<td><span className="humidity-value">{item.humidity} %</span></td>
-              <td>{item.status || 'N/A'}</td>
-              <td>{new Date(item.dateTime).toLocaleString()}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+          <SensorChart data={filteredData} />
+        </>
+      )}
+
       <br />
-      <SensorChart data={filteredData} />
       <Link to="/dashboard" className="gray-button">← Back</Link>
     </div>
   );
