@@ -8,7 +8,7 @@ const SystemAlert = () => {
   const [alerts, setAlerts] = useState([]);
 
    useEffect(() => {
-    axios.get('http://wildfireeye.onrender.com/api/firebasedata/alerts')
+    axios.get('https://wildfireeye.onrender.com/api/firebasedata/alerts')
       .then(res => setAlerts(res.data))
       .catch(err => console.error(err));
   }, []);
