@@ -13,9 +13,10 @@ const path = require('path');
 const app = express();
 
 app.use(cors({
-    origin: '*', // Разрешаем все источники
-    
+  origin: ['http://localhost:3001', 'https://wildfireeye.onrender.com'],
+  credentials: true
 }));
+
 app.use(express.json());
 
 // ✅ Сначала API маршруты
