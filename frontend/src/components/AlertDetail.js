@@ -27,39 +27,43 @@ const AlertDetail = () => {
     }
   };
 
-  const handleArchive = () => {
-    axios.patch(`https://wildfireeye.onrender.com/api/alerts/${id}/archive`)
-      .then(() => {
-        alert('Alert archived.');
-        navigate('/alerts');
-      })
-      .catch(err => console.error('Failed to archive alert:', err));
+  const handleArchive = async () => {
+    try {
+      await axios.patch(`https://wildfireeye.onrender.com/api/alerts/${id}/archive`);
+      alert('Alert archived.');
+      navigate('/alerts');
+    } catch (err) {
+      console.error('Failed to archive alert:', err);
+    }
   };
 
-  if (!alert) return <div className="alert-detail-wrapper"><h2>Alert not found</h2></div>;
+  if (!alert) return <div className="alert-detail-wrapper"><h2>Alert not found</h2></div>; 
 
   return (
     <div className="alert-detail-wrapper">
-      <h2 className="alert-heading">🚨 Alert Detail
-      </h2>
+      <h2 className="alert-heading">🚨 Alert Detail</h2>
 
       <div className={`alert-card status-${alert.status}`}>
         <p><strong>📌 Type:</strong> {alert.type}</p>
         <p><strong>🔖 ID:</strong> {alert.sensorId}</p>
         <p><strong>🕓 Date/Time:</strong> {new Date(alert.dateTime).toLocaleString()}</p>
         <p><strong>📍 GPS:</strong> {alert.gps.join(', ')}</p>
-        <p><strong>🌡 Temperature:</strong> {alert.temperature} °C</p>
-        <p><strong>💧 Humidity:</strong> {alert.humidity} %</p>
-        <p><strong>🚴 CO2 Level:</strong> {alert.co2Level} ppm</p>
+       <p><strong>🌡 Temp:</strong> {alert.temperature ?? alert.value ?? '–'} °C</p>
+            <p><strong>💧 Humidity:</strong> {alert.humidity ?? alert.value ?? '–'} %</p>
+            <p><strong>🚴 CO2:</strong> {alert.co2Level ?? alert.value ?? '–'} ppm</p>
         <p><strong>✅ Status:</strong> <span className={`status-label ${alert.status}`}>{alert.status}</span></p>
         <p><strong>📝 Description:</strong> {alert.description || '–'}</p>
       </div>
 
       <div className="button-group">
-        <Link to="/alerts" className="button"> ← Back</Link>
+        <Link to="/alerts" className="button">← Back</Link>
         <Link to={`/monitoring/${alert.sensorId}`} className="button">View Monitoring</Link>
-        {!alert.confirmed && <button onClick={confirmAlert} className="button">Confirm</button>}
-        <button onClick={handleArchive} className="gray-button">Archive</button>
+        {!alert.confirmed && (
+          <button onClick={confirmAlert} className="button">Confirm</button>
+        )}
+        {!alert.archived && (
+          <button onClick={handleArchive} className="gray-button">Archive</button>
+        )}
       </div>
     </div>
   );

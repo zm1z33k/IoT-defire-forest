@@ -12,7 +12,7 @@ const MonitoringDetail = () => {
 
   useEffect(() => {
     axios
-      .get(`https://wildfireeye.onrender.com/api/firebasedata/monitoring/${id}`)
+      .get(`https://wildfireeye.onrender.com/api/firebase/monitoring/${id}`)
       .then((res) => setData(res.data))
       .catch((err) => console.error(err));
   }, [id]);
@@ -26,8 +26,8 @@ const MonitoringDetail = () => {
         return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
       case 'today':
         return new Date(new Date().setHours(0, 0, 0, 0));
-      case 'all':
-        return new Date(0); // начало эпохи Unix, то есть "всё время"
+      case 'all': 
+      return new Date(0); // начало эпохи Unix, то есть "всё время"
       default:
         return new Date(now.getTime() - 24 * 60 * 60 * 1000);
     }

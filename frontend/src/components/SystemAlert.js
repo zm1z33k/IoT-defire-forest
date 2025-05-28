@@ -1,4 +1,4 @@
-// SystemAlert.js
+// 📁 components/SystemAlert.js
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles.css';
@@ -6,67 +6,59 @@ import axios from 'axios';
 
 const SystemAlert = () => {
   const [alerts, setAlerts] = useState([]);
+  const [showArchive, setShowArchive] = useState(false);
 
-   useEffect(() => {
-    axios.get('https://wildfireeye.onrender.com/api/firebasedata/alerts')
+  useEffect(() => {
+    axios.get('https://wildfireeye.onrender.com/api/alerts')
       .then(res => setAlerts(res.data))
-      .catch(err => console.error(err));
+      .catch(err => console.error('Failed to fetch alerts:', err));
   }, []);
 
   const handleConfirm = async (id) => {
     try {
-      await axios.patch(`https://wildfireeye.onrender.com/api/firebasedata/alerts/${id}/confirm`);
-      setAlerts(prev =>
-        prev.map(a => a._id === id ? { ...a, confirmed: true, status: 'Confirmed' } : a)
-      );
+      await axios.patch(`https://wildfireeye.onrender.com/api/alerts/${id}/confirm`);
+      setAlerts(prev => prev.map(a => a._id === id ? { ...a, confirmed: true, status: 'Confirmed' } : a));
     } catch (err) {
       console.error('Error confirming alert:', err);
     }
   };
 
-  const [showArchive, setShowArchive] = useState(false);
+  const handleArchive = async (id) => {
+    try {
+      await axios.patch(`https://wildfireeye.onrender.com/api/alerts/${id}/archive`);
+      setAlerts(prev => prev.map(a => a._id === id ? { ...a, archived: true, status: 'Archived' } : a));
+    } catch (err) {
+      console.error('Failed to archive alert:', err);
+    }
+  };
 
-    const filteredAlerts = alerts.filter(alert =>
-    showArchive ? alert.archived : !alert.archived
-  );
+  const filteredAlerts = alerts.filter(alert => showArchive ? alert.archived : !alert.archived);
 
   return (
     <div className="system-alert-container">
-      <h2>System Alert</h2>
+      <h2>System Alerts</h2>
+
+      <div className="filter-toggle">
+        <button onClick={() => setShowArchive(false)} className={!showArchive ? 'active' : ''}>Active</button>
+        <button onClick={() => setShowArchive(true)} className={showArchive ? 'active' : ''}>Archived</button>
+      </div>
+
       <div className="grid">
-        {alerts.map(alert => (
-         <div
-              key={alert._id}
-                className={`card ${
-                alert.status === 'Warning'
-                ? 'alert-card warning'
-                : alert.status === 'Active'
-                ? 'alert-card active'
-                : 'alert-card neutral'
-                }`}
->
-            <p><strong>{alert.type}</strong> ID {alert.sensorId}</p>
-            <p><strong>Date/Time</strong><br />{new Date(alert.dateTime).toLocaleString()}</p>
-            <p><strong>GPS</strong><br />{alert.gps.join(', ')}</p>
-            <p><strong>t°</strong><br />{alert.temperature} °C</p>
-            <p><strong>Humidity</strong><br />{alert.humidity} %</p>
-            <p><strong>CO2</strong><br />{alert.co2Level} ppm</p>
-            <p><strong>System status</strong><br />{alert.status}</p>
+        {filteredAlerts.map(alert => (
+          <div key={alert._id} className={`card alert-card ${alert.status.toLowerCase()}`}>
+            <p><strong>{alert.type}</strong> (ID: {alert.sensorId})</p>
+            <p><strong>Date:</strong> {new Date(alert.dateTime).toLocaleString()}</p>
+            <p><strong>GPS:</strong> {alert.gps?.join(', ') || '–'}</p>
+            <p><strong>🌡 Temp:</strong> {alert.temperature ?? alert.value ?? '–'} °C</p>
+            <p><strong>💧 Humidity:</strong> {alert.humidity ?? alert.value ?? '–'} %</p>
+            <p><strong>🚴 CO2:</strong> {alert.co2Level ?? alert.value ?? '–'} ppm</p>
+            <p><strong>Status:</strong> {alert.status}</p>
 
             <div className="button-group">
-              {!alert.confirmed ? (
-                <>
-                  <Link to={`/alerts/${alert._id}`} className="gray-button">More</Link>
-                  <button className="gray-button" onClick={() => handleConfirm(alert._id)}>Confirm</button>
-                </>
-              ) : (
-                  <Link to={`/alerts/${alert._id}`} className="gray-button">Read More</Link>
-              )}
+              <Link to={`/alerts/${alert._id}`} className="gray-button">{alert.confirmed ? 'Read More' : 'More'}</Link>
+              {!alert.confirmed && <button className="gray-button" onClick={() => handleConfirm(alert._id)}>Confirm</button>}
+              {!alert.archived && <button className="gray-button" onClick={() => handleArchive(alert._id)}>Archive</button>}
             </div>
-              <div className="filter-toggle">
-                <button onClick={() => setShowArchive(false)} className={!showArchive ? 'active' : ''}>Active Alerts</button>
-                <button onClick={() => setShowArchive(true)} className={showArchive ? 'active' : ''}>Archived Alerts</button>
-              </div>
           </div>
         ))}
       </div>

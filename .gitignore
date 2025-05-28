@@ -1,7 +1,7 @@
 # Node.js
 node_modules/
 .env
-iot-project-36b08-firebase-adminsdk-fbsvc-0b07608f6a.json
+serviceAccountKey.json
 
 # Logs
 npm-debug.log*

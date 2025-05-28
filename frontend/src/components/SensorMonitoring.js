@@ -6,6 +6,8 @@ import axios from 'axios';
 import 'leaflet/dist/leaflet.css';
 import '../styles.css';
 
+
+
 const sensorIcon = new L.Icon({
   iconUrl: 'https://cdn-icons-png.flaticon.com/512/1397/1397898.png',
   iconSize: [32, 32],
@@ -26,11 +28,10 @@ const FixMapSize = () => {
 const SensorMonitoring = () => {
   const [sensorData, setSensorData] = useState([]);
   const [showMap, setShowMap] = useState(true);
-  const markerRefs = useRef({});
 
   useEffect(() => {
     axios
-      .get('https://wildfireeye.onrender.com/api/firebasedata/monitoring')
+      .get('https://wildfireeye.onrender.com/api/firebase/monitoring')
       .then((res) => setSensorData(res.data))
       .catch((err) => console.error('Sensor data error:', err));
   }, []);
@@ -52,14 +53,18 @@ const SensorMonitoring = () => {
             <FixMapSize />
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             {sensorData.map((sensor) => (
-              <Marker
-                key={sensor._id}
+              <Marker key={sensor._id}
                 position={sensor.gps}
                 icon={sensorIcon}
+                pathOptions={{
+                  color: '#64829B',
+                  fillColor: '#A0C4DC',
+                  fillOpacity: 0.9,
+                  weight: 2,
+                }}
                 ref={(el) => {
                   if (el) markerRefs.current[sensor._id] = el;
-                }}
-              >
+                }}>
                 <Popup>
                   <strong>{sensor.sensorId}</strong>
                   <br />🌡 Temp: {sensor.temperature} °C
@@ -88,17 +93,7 @@ const SensorMonitoring = () => {
             </thead>
             <tbody>
               {sensorData.map((sensor) => (
-                <tr
-                  key={sensor._id}
-                  onMouseEnter={() => {
-                    const marker = markerRefs.current[sensor._id];
-                    if (marker) marker.setOpacity(0.5);
-                  }}
-                  onMouseLeave={() => {
-                    const marker = markerRefs.current[sensor._id];
-                    if (marker) marker.setOpacity(1);
-                  }}
-                >
+                <tr key={sensor._id}>
                   <td>
                     <Link to={`/monitoring/${sensor.sensorId}`} className="sensor-link">
                       {sensor.sensorId}
