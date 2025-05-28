@@ -24,6 +24,12 @@ const SystemAlert = () => {
     }
   };
 
+  const [showArchive, setShowArchive] = useState(false);
+
+    const filteredAlerts = alerts.filter(alert =>
+    showArchive ? alert.archived : !alert.archived
+  );
+
   return (
     <div className="system-alert-container">
       <h2>System Alert</h2>
@@ -54,9 +60,13 @@ const SystemAlert = () => {
                   <button className="gray-button" onClick={() => handleConfirm(alert._id)}>Confirm</button>
                 </>
               ) : (
-                <Link to={`/alerts/${alert._id}`} className="gray-button">Read More</Link>
+                  <Link to={`/alerts/${alert._id}`} className="gray-button">Read More</Link>
               )}
             </div>
+              <div className="filter-toggle">
+                <button onClick={() => setShowArchive(false)} className={!showArchive ? 'active' : ''}>Active Alerts</button>
+                <button onClick={() => setShowArchive(true)} className={showArchive ? 'active' : ''}>Archived Alerts</button>
+              </div>
           </div>
         ))}
       </div>
