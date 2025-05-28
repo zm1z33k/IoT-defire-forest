@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { getAlerts, confirmAlert, createAlert } = require('../controllers/alertController');
+const { getAllAlerts, confirmAlert, archiveAlert } = require('../controllers/alertController');
 
-// nemusíš používat `auth` pro testování
-router.get('/', getAlerts);
-router.post('/', createAlert);
-router.put('/:id/confirm', confirmAlert); // <- potvrzení alertu
+router.get('/', getAllAlerts);
+router.patch('/:id/confirm', confirmAlert);   // подтверждение
+router.patch('/:id/archive', archiveAlert);   // архивирование ✅ <== ОБЯЗАТЕЛЬНО!
 
 module.exports = router;

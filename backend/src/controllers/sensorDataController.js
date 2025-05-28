@@ -1,5 +1,5 @@
+// 📁 controllers/sensorDataController.js
 const db = require('../firebase');
-const { getFirestore } = require('firebase-admin/firestore');
 
 // 🔧 Проверка и создание алертов
 const checkAndCreateAlert = async (sensorData) => {
@@ -57,7 +57,6 @@ const checkAndCreateAlert = async (sensorData) => {
       });
     }
 
-    // Сохраняем алерты
     for (const alert of alerts) {
       await db.collection('alerts').add(alert);
       console.log(`🚨 Alert created: ${alert.type} from ${sensorId}`);
@@ -71,7 +70,6 @@ const checkAndCreateAlert = async (sensorData) => {
 const createSensorData = async (req, res) => {
   try {
     const data = req.body;
-
     await db.collection('monitoring').add(data);
     console.log('📥 New sensor data:', data);
 
