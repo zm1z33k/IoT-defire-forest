@@ -13,49 +13,50 @@ const MonitoringDetail = () => {
   useEffect(() => {
     axios
       .get(`https://wildfireeye.onrender.com/api/firebase/monitoring/${id}`)
-      .then((res) => setData(res.data))
-      .catch((err) => console.error(err));
+      .then((res) => {
+        console.log("Server response:", res.data);
+        if (Array.isArray(res.data)) {
+          setData(res.data);
+        } else if (Array.isArray(res.data.records)) {
+          setData(res.data.records);
+        } else {
+          console.warn("Unexpected response format:", res.data);
+          setData([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch monitoring data:", err);
+        setData([]);
+      });
   }, [id]);
 
   const getTimeLimit = () => {
     const now = new Date();
     switch (timeRange) {
-      case '7d':
-        return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      case '30d':
-        return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-      case 'today':
-        return new Date(new Date().setHours(0, 0, 0, 0));
-      case 'all': 
-      return new Date(0); // начало эпохи Unix, то есть "всё время"
-      default:
-        return new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      case '7d': return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      case '30d': return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      case 'today': return new Date(new Date().setHours(0, 0, 0, 0));
+      case 'all': return new Date(0);
+      default: return new Date(now.getTime() - 24 * 60 * 60 * 1000);
     }
   };
 
-  const filteredByTime = data.filter((item) => new Date(item.dateTime) >= getTimeLimit());
+  const filteredByTime = Array.isArray(data)
+    ? data.filter(item => new Date(item.dateTime) >= getTimeLimit())
+    : [];
 
   const sortData = (arr, option) => {
     const sorted = [...arr];
     switch (option) {
-      case 'recent':
-        return sorted.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
-      case 'oldest':
-        return sorted.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
-      case 'tempAsc':
-        return sorted.sort((a, b) => a.temperature - b.temperature);
-      case 'tempDesc':
-        return sorted.sort((a, b) => b.temperature - a.temperature);
-      case 'co2Asc':
-        return sorted.sort((a, b) => a.co2Level - b.co2Level);
-      case 'co2Desc':
-        return sorted.sort((a, b) => b.co2Level - a.co2Level);
-      case 'humidityAsc':
-        return sorted.sort((a, b) => a.humidity - b.humidity);
-      case 'humidityDesc':
-        return sorted.sort((a, b) => b.humidity - a.humidity);
-      default:
-        return sorted;
+      case 'recent': return sorted.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
+      case 'oldest': return sorted.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+      case 'tempAsc': return sorted.sort((a, b) => a.temperature - b.temperature);
+      case 'tempDesc': return sorted.sort((a, b) => b.temperature - a.temperature);
+      case 'co2Asc': return sorted.sort((a, b) => a.co2Level - b.co2Level);
+      case 'co2Desc': return sorted.sort((a, b) => b.co2Level - a.co2Level);
+      case 'humidityAsc': return sorted.sort((a, b) => a.humidity - b.humidity);
+      case 'humidityDesc': return sorted.sort((a, b) => b.humidity - a.humidity);
+      default: return sorted;
     }
   };
 
@@ -108,7 +109,7 @@ const MonitoringDetail = () => {
             <tbody>
               {filteredData.map((item) => (
                 <tr key={item._id}>
-                  <td>{item.gps.join(', ')}</td>
+                  <td>{Array.isArray(item.gps) ? item.gps.join(', ') : 'N/A'}</td>
                   <td className="temp-value">{item.temperature} °F</td>
                   <td className="co2-value">{item.co2Level} ppm</td>
                   <td className="humidity-value">{item.humidity} %</td>
