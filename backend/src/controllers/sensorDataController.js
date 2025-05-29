@@ -5,7 +5,10 @@ const db = require('../firebase');
 const checkAndCreateAlert = async (sensorData) => {
   try {
     const settingsSnap = await db.collection('config').doc('thresholds').get();
-    if (!settingsSnap.exists) return;
+    if (!settingsSnap.exists) {
+      console.log('⚠️ No thresholds found');
+      return;
+    }
 
     const raw = settingsSnap.data();
     const thresholds = {
@@ -17,30 +20,38 @@ const checkAndCreateAlert = async (sensorData) => {
       minHumidity: Number(raw?.humidityMin),
     };
 
+    console.log('📊 Thresholds:', thresholds);
+    console.log('📥 Incoming data:', sensorData);
+
     const { temperature, co2Level, humidity, gps, sensorId } = sensorData;
     const alerts = [];
 
     const now = new Date().toISOString();
 
     if (thresholds.maxTemperature && temperature > thresholds.maxTemperature) {
+      console.log('🚨 Temp exceeds threshold');
       alerts.push({ sensorId, type: 'High Temperature', temperature, humidity, co2Level, gps, status: 'Active', dateTime: now });
     }
+
     if (thresholds.maxCO2 && co2Level > thresholds.maxCO2) {
+      console.log('🚨 CO2 exceeds threshold');
       alerts.push({ sensorId, type: 'High CO2 Level', temperature, humidity, co2Level, gps, status: 'Active', dateTime: now });
     }
+
     if (thresholds.maxHumidity && humidity > thresholds.maxHumidity) {
+      console.log('🚨 Humidity exceeds threshold');
       alerts.push({ sensorId, type: 'High Humidity', temperature, humidity, co2Level, gps, status: 'Active', dateTime: now });
     }
 
     for (const alert of alerts) {
       await db.collection('alerts').add(alert);
+      console.log('✅ Alert created:', alert);
       await db.collection('monitoring').add({ ...alert, origin: 'alert' });
     }
   } catch (err) {
     console.error('❌ Failed alert check:', err);
   }
 };
-
 const createSensorData = async (req, res) => {
   try {
     const data = req.body;
