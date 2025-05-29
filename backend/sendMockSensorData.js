@@ -24,7 +24,7 @@ const mockData = [
 async function uploadMockData() {
   for (const item of mockData) {
     try {
-      const docRef = await db.collection("sensors").add(item);
+      const docRef = await db.collection("monitoring").add(item);
       console.log("✅ Uploaded:", docRef.id);
     } catch (err) {
       console.error("❌ Error uploading:", err);

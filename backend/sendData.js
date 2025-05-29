@@ -36,7 +36,7 @@ async function sendData() {
 
   try {
 
-    await db.collection("sensors").add(data);
+    await db.collection("monitoring").add(data);
     console.log("📦 Sensor data saved");
 
     if (shouldCreateAlert) {

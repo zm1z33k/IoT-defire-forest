@@ -39,9 +39,28 @@ const archiveAlert = async (req, res) => {
   }
 };
 
+const createAlert = async (req, res) => {
+  try {
+    const data = {
+      ...req.body,
+      confirmed: false,
+      archived: false,
+      status: req.body.status || 'Active',
+      dateTime: req.body.dateTime || new Date().toISOString(),
+    };
+
+    const docRef = await db.collection('alerts').add(data);
+    res.status(201).json({ message: 'Alert created', id: docRef.id });
+  } catch (err) {
+    console.error('❌ Failed to create alert:', err);
+    res.status(500).json({ message: 'Failed to create alert' });
+  }
+};
+
 module.exports = {
   getAllAlerts,
   confirmAlert,
-  archiveAlert
+  archiveAlert,
+  createAlert
 };
 

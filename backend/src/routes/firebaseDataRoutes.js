@@ -20,7 +20,7 @@ router.get('/alerts', async (req, res) => {
 
 router.get('/monitoring', async (req, res) => {
   try {
-    const snapshot = await db.collection('sensors').orderBy('dateTime', 'desc').get();
+    const snapshot = await db.collection('monitoring').orderBy('dateTime', 'desc').get();
     const sensors = snapshot.docs.map(doc => ({ _id: doc.id, ...doc.data() }));
     res.json(sensors);
   } catch (err) {
@@ -32,7 +32,7 @@ router.get('/monitoring', async (req, res) => {
 router.get('/monitoring/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const snapshot = await db.collection('sensors')
+    const snapshot = await db.collection('monitoring')
       .where('sensorId', '==', id)
       .orderBy('dateTime', 'desc')
       .limit(30)
@@ -71,7 +71,7 @@ router.post('/gateway', async (req, res) => {
     const data = req.body;
      console.log('📥 Mame data ', data); 
 
-    await db.collection('sensors').add(data);
+    await db.collection('monitorng').add(data);
 
 
     const thresholds = await getThresholds();
