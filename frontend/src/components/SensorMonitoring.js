@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Link } from 'react-router-dom';
 import L from 'leaflet';
 import axios from 'axios';
@@ -20,28 +20,27 @@ const SensorMonitoring = () => {
   const markerRefs = useRef({});
 
   useEffect(() => {
-    axios
-      .get('https://wildfireeye.onrender.com/api/firebasedata/monitoring')
-      .then((res) => setSensorData(res.data))
-      .catch((err) => console.error('Sensor data error:', err));
-  }, []);
+  axios
+    .get('https://wildfireeye.onrender.com/api/sensors')
+  .then((res) => {
+    console.log("🔎 Первый объект:", res.data[0]);
+    setSensorData(res.data);
+    })
+    .catch((err) => console.error('Sensor data error:', err));
+}, []);
 
-  const sortData = (data, option) => {
-    const sorted = [...data];
-    switch (option) {
-      case 'recent': return sorted.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
-      case 'oldest': return sorted.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
-      case 'tempAsc': return sorted.sort((a, b) => a.temperature - b.temperature);
-      case 'tempDesc': return sorted.sort((a, b) => b.temperature - a.temperature);
-      case 'co2Asc': return sorted.sort((a, b) => a.co2Level - b.co2Level);
-      case 'co2Desc': return sorted.sort((a, b) => b.co2Level - a.co2Level);
-      case 'humidityAsc': return sorted.sort((a, b) => a.humidity - b.humidity);
-      case 'humidityDesc': return sorted.sort((a, b) => b.humidity - a.humidity);
-      default: return sorted;
-    }
+  const sortMap = {
+    recent: (a, b) => new Date(b.dateTime) - new Date(a.dateTime),
+    oldest: (a, b) => new Date(a.dateTime) - new Date(b.dateTime),
+    tempAsc: (a, b) => a.temperature - b.temperature,
+    tempDesc: (a, b) => b.temperature - a.temperature,
+    co2Asc: (a, b) => a.co2Level - b.co2Level,
+    co2Desc: (a, b) => b.co2Level - a.co2Level,
+    humidityAsc: (a, b) => a.humidity - b.humidity,
+    humidityDesc: (a, b) => b.humidity - a.humidity,
   };
 
-  const sortedData = sortData(sensorData, sortOption);
+  const sortedData = [...sensorData].sort(sortMap[sortOption] || (() => 0));
 
   return (
     <div className="sensor-container">
@@ -56,24 +55,30 @@ const SensorMonitoring = () => {
       {showMap && (
         <div className="dashboard-map-full">
           <MapContainer center={[50.088, 14.42076]} zoom={8} scrollWheelZoom={false} className="leaflet-container">
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap contributors" />
-            {sensorData.map((sensor) => (
-              <Marker
-                key={sensor._id}
-                position={sensor.gps}
-                icon={sensorIcon}
-                ref={(el) => {
-                  if (el) markerRefs.current[sensor._id] = el;
-                }}
-              >
-                <Popup>
-                  <strong>{sensor.sensorId}</strong><br />
-                  🌡 Temp: {sensor.temperature} °C<br />
-                  💧 Humidity: {sensor.humidity} %<br />
-                  🟤 CO₂: {sensor.co2Level} ppm
-                </Popup>
-              </Marker>
-            ))}
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution="&copy; OpenStreetMap contributors"
+            />
+            {sortedData.map((sensor) => {
+              const key = sensor._id || `${sensor.sensorId}-${sensor.dateTime}`;
+              return (
+                <Marker
+                  key={key}
+                  position={Array.isArray(sensor.gps) ? sensor.gps : [0, 0]}
+                  icon={sensorIcon}
+                  ref={(el) => {
+                    if (el) markerRefs.current[key] = el;
+                  }}
+                >
+                  <Popup>
+                    <strong>{sensor.sensorId}</strong><br />
+                    🌡 Temp: {sensor.temperature ?? 'N/A'} °C<br />
+                    💧 Humidity: {sensor.humidity ?? 'N/A'} %<br />
+                    🟤 CO₂: {sensor.co2Level ?? 'N/A'} ppm
+                  </Popup>
+                </Marker>
+              );
+            })}
           </MapContainer>
         </div>
       )}
@@ -105,31 +110,34 @@ const SensorMonitoring = () => {
             </tr>
           </thead>
           <tbody>
-            {sortedData.map((sensor) => (
-              <tr
-                key={sensor._id}
-                onMouseEnter={() => {
-                  const marker = markerRefs.current[sensor._id];
-                  if (marker) marker.setOpacity(0.5);
-                }}
-                onMouseLeave={() => {
-                  const marker = markerRefs.current[sensor._id];
-                  if (marker) marker.setOpacity(1);
-                }}
-              >
-                <td>
-                  <Link to={`/monitoring/${sensor.sensorId}`} className="sensor-link">
-                    {sensor.sensorId}
-                  </Link>
-                </td>
-                <td>{sensor.gps.join(', ')}</td>
-                <td>{sensor.temperature} °C</td>
-                <td>{sensor.humidity} %</td>
-                <td>{sensor.co2Level} ppm</td>
-                <td>{new Date(sensor.dateTime).toLocaleString()}</td>
-              </tr>
-            ))}
-          </tbody>
+  {sortedData.map((sensor) => {
+    const key = sensor._id || `${sensor.sensorId}-${sensor.dateTime}`;
+    return (
+      <tr
+        key={key}
+        onMouseEnter={() => {
+          const marker = markerRefs.current[key];
+          if (marker) marker.setOpacity(0.5);
+        }}
+        onMouseLeave={() => {
+          const marker = markerRefs.current[key];
+          if (marker) marker.setOpacity(1);
+        }}
+      >
+        <td>
+          <Link to={`/monitoring/${sensor.sensorId}`} className="sensor-link">
+            {sensor.sensorId}
+          </Link>
+        </td>
+        <td>{sensor.gps && Array.isArray(sensor.gps) ? sensor.gps.join(', ') : 'N/A'}</td>
+        <td>{sensor.temperature ?? 'N/A'} °C</td>
+        <td>{sensor.humidity ?? 'N/A'} %</td>
+        <td>{sensor.co2Level ?? 'N/A'} ppm</td>
+        <td>{sensor.dateTime ? new Date(sensor.dateTime).toLocaleString() : 'N/A'}</td>
+      </tr>
+    );
+  })}
+</tbody>
         </table>
       </div>
     </div>

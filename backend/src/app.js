@@ -7,7 +7,7 @@ const routes = require('./routes');
 const app = express();
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://wildfireeye.onrender.com'],
+  origin: ['http://localhost:3000', 'http://localhost:3001', 'https://wildfireeye.onrender.com'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));

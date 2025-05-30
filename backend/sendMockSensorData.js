@@ -11,14 +11,42 @@ const db = getFirestore();
 
 const mockData = [
   {
-  "sensorId": "A21",
-  "temperature": 67.5,
-  "co2Level": 1200,
-  "humidity": 65,
-  "gps": [50.880078, 14.249905],
-  "status": "Active",
-  "dateTime": "2025-05-26T17:00:00Z"
-}
+    "sensorId": "A22",
+    "temperature": 68.1,
+    "co2Level": 1250,
+    "humidity": 64,
+    "gps": [50.880078, 14.249905],
+    "status": "Active",
+    "dateTime": "2025-05-25T17:00:00Z"
+  },
+  {
+    "sensorId": "A22",
+    "temperature": 66.9,
+    "co2Level": 1190,
+    "humidity": 66,
+    "gps": [50.880078, 14.249905],
+    "status": "Active",
+    "dateTime": "2025-05-24T17:00:00Z"
+  },
+  {
+    "sensorId": "A22",
+    "temperature": 67.8,
+    "co2Level": 1225,
+    "humidity": 63,
+    "gps": [50.880078, 14.249905],
+    "status": "Active",
+    "dateTime": "2025-05-23T17:00:00Z"
+  },
+  {
+    "sensorId": "A22",
+    "temperature": 67.2,
+    "co2Level": 1210,
+    "humidity": 65,
+    "gps": [50.880078, 14.249905],
+    "status": "Active",
+    "dateTime": "2025-05-22T17:00:00Z"
+  }
+
 ];
 
 async function uploadMockData() {

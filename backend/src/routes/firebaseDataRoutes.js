@@ -34,13 +34,18 @@ router.get('/monitoring/:id', async (req, res) => {
   try {
     const snapshot = await db.collection('monitoring')
       .where('sensorId', '==', id)
-      .orderBy('dateTime', 'desc')
+      .orderBy('dateTime', 'desc') // если нужен порядок
       .limit(30)
       .get();
+
     const data = snapshot.docs.map(doc => ({ _id: doc.id, ...doc.data() }));
     res.json(data);
   } catch (err) {
-    res.status(500).json({ message: 'Error fetching sensor details', error: err });
+    console.error('🔥 Firestore error:', err);
+    res.status(500).json({
+      message: 'Error fetching sensor details',
+      error: err.message,
+    });
   }
 });
 

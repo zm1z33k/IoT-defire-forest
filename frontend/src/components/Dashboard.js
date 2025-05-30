@@ -37,11 +37,17 @@ const Dashboard = () => {
 
   useEffect(() => {
     axios.get('https://wildfireeye.onrender.com/api/firebasedata/monitoring')
-      .then(res => setSensorData(res.data))
+      .then(res => {
+        const filtered = res.data.filter(sensor => Array.isArray(sensor.gps) && sensor.gps.length === 2);
+        setSensorData(filtered);
+      })
       .catch(err => console.error('Sensor data error:', err));
 
     axios.get('https://wildfireeye.onrender.com/api/firebasedata/alerts')
-      .then(res => setAlerts(res.data))
+      .then(res => {
+        const filtered = res.data.filter(alert => Array.isArray(alert.gps) && alert.gps.length === 2);
+        setAlerts(filtered);
+      })
       .catch(err => console.error('Alerts error:', err));
   }, []);
 
@@ -52,11 +58,11 @@ const Dashboard = () => {
       {latestSensorData.map(sensor => (
         <Marker key={sensor._id} position={sensor.gps} icon={sensorIcon}>
           <Popup>
-                            <strong>{sensor.sensorId}</strong>
-                            <br />🌡 Temp: {sensor.temperature} °C
-                            <br />💧 Humidity: {sensor.humidity} %
-                            <br />🟤 CO₂: {sensor.co2Level} ppm
-                          </Popup>
+            <strong>{sensor.sensorId}</strong>
+            <br />🌡 Temp: {sensor.temperature} °C
+            <br />💧 Humidity: {sensor.humidity} %
+            <br />🟤 CO₂: {sensor.co2Level} ppm
+          </Popup>
         </Marker>
       ))}
       {alerts.map(alert => (
@@ -96,7 +102,7 @@ const AlertsSection = ({ alerts }) => (
       <p>No active alerts</p>
     ) : (
       <div className="grid">
-        {Array.isArray(alerts) && alerts.map(alert => (
+        {alerts.map(alert => (
           <div className="card alert-card" key={alert._id}>
             <p><strong>Sensor:</strong> {alert.sensorId}</p>
             <p><strong>Status:</strong> {alert.status}</p>
@@ -113,21 +119,34 @@ const AlertsSection = ({ alerts }) => (
 const SensorDataSection = ({ data }) => (
   <section>
     <h3>📈 Latest Sensor Data</h3>
-    <div className="grid">
-      {data.map(sensor => (
-       <div className="sensor-card" key={sensor._id}>
-  <p><strong className="label">Sensor ID:</strong> <span className="value">{sensor.sensorId}</span></p>
-  <p><strong className="label">📍 GPS:</strong> <span className="value">{sensor.gps.join(', ')}</span></p>
-  <p><strong className="label">🌡 Temp:</strong> <span className="temp-value">{sensor.temperature}°C</span></p>
-  <p><strong className="label">💧 Humidity:</strong> <span className="humidity-value">{sensor.humidity} %</span></p>
-  <p><strong className="label">🟤 CO₂:</strong> <span className="co2-value">{sensor.co2Level} ppm</span></p>
-  <p><strong className="label">🕓 Last updated:</strong><br />
-    <span className="date-value">{new Date(sensor.dateTime).toLocaleString()}</span>
-  </p>
-  <Link to={`/monitoring/${sensor.sensorId}`} className="button">View Monitoring</Link>
-</div>
-      ))}
-    </div>
+    <table className="sensor-table">
+      <thead>
+        <tr>
+          <th>Sensor ID</th>
+          <th>GPS</th>
+          <th>Temperature</th>
+          <th>Humidity</th>
+          <th>CO₂ Level</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {data.map(sensor => (
+          <tr key={sensor._id}>
+            <td>{sensor.sensorId || 'N/A'}</td>
+            <td>{Array.isArray(sensor.gps) ? `${sensor.gps[0]}, ${sensor.gps[1]}` : 'N/A'}</td>
+            <td>{sensor.temperature ?? 'N/A'} °C</td>
+            <td>{sensor.humidity ?? 'N/A'} %</td>
+            <td>{sensor.co2Level ?? 'N/A'} ppm</td>
+            <td>{sensor.dateTime ? new Date(sensor.dateTime).toLocaleString() : 'N/A'}</td>
+            <td>
+              <Link to={`/monitoring/${sensor.sensorId}`} className="button">View Monitoring</Link>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   </section>
 );
 
