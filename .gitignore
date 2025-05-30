@@ -11,3 +11,6 @@ yarn-error.log*
 # Build
 /build
 /dist
+
+# Ignore Firebase secrets
+*.json
